@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import ArticleCard from "@/components/ArticleCard";
 import Newsletter from "@/components/Newsletter";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   // Simulate loading state for images
@@ -50,7 +51,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navigation />
       
       {/* Hero Section */}
@@ -94,6 +95,8 @@ const Index = () => {
 
       {/* Newsletter Section */}
       <Newsletter />
+
+      <Footer />
     </div>
   );
 };

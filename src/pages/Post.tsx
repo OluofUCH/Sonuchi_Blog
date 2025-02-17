@@ -1,14 +1,13 @@
-
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Newsletter from "@/components/Newsletter";
+import Footer from "@/components/Footer";
 import { Clock, Calendar, Heart, Share2 } from "lucide-react";
 
 const Post = () => {
   const { id } = useParams();
 
-  // Simulate loading state for images
   useEffect(() => {
     const images = document.querySelectorAll("img");
     images.forEach((img) => {
@@ -20,7 +19,6 @@ const Post = () => {
     });
   }, []);
 
-  // This is mock data - in a real app, you'd fetch this based on the post ID
   const post = {
     title: "The Future of Web Development",
     category: "Technology",
@@ -56,11 +54,10 @@ const Post = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navigation />
 
-      <article className="mx-auto max-w-4xl px-4 py-12">
-        {/* Header */}
+      <article className="flex-1 mx-auto max-w-4xl px-4 py-12">
         <header className="mb-8 text-center">
           <div className="mb-4 flex items-center justify-center gap-4">
             <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900">
@@ -94,7 +91,6 @@ const Post = () => {
           </div>
         </header>
 
-        {/* Featured Image */}
         <div className="mb-12 overflow-hidden rounded-xl">
           <img
             src={post.image}
@@ -103,7 +99,6 @@ const Post = () => {
           />
         </div>
 
-        {/* Content */}
         <div 
           className="prose prose-lg mx-auto max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content }}
@@ -111,6 +106,7 @@ const Post = () => {
       </article>
 
       <Newsletter />
+      <Footer />
     </div>
   );
 };
