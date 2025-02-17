@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import ArticleCard from "@/components/ArticleCard";
 import Newsletter from "@/components/Newsletter";
+import Navigation from "@/components/Navigation";
 
 const Index = () => {
   // Simulate loading state for images
@@ -50,6 +51,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Navigation />
+      
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-2xl text-center">
