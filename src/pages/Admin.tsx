@@ -1,8 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PostForm {
   title: string;
@@ -10,33 +12,82 @@ interface PostForm {
   excerpt: string;
   content: string;
   image: string;
+  readTime: string;
 }
 
 const Admin = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<PostForm>({
     title: "",
     category: "",
     excerpt: "",
     content: "",
     image: "",
+    readTime: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/auth");
+      }
+    } catch (error) {
+      navigate("/auth");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would save to a backend
-    console.log("Form submitted:", formData);
-    toast({
-      title: "Success",
-      description: "Post has been created successfully!",
-    });
-    setFormData({
-      title: "",
-      category: "",
-      excerpt: "",
-      content: "",
-      image: "",
-    });
+    setLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      const { error } = await supabase.from("posts").insert({
+        title: formData.title,
+        category: formData.category,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        image: formData.image,
+        read_time: formData.readTime,
+        author: user.email,
+        user_id: user.id,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Post has been created successfully!",
+      });
+
+      setFormData({
+        title: "",
+        category: "",
+        excerpt: "",
+        content: "",
+        image: "",
+        readTime: "",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (
@@ -49,13 +100,28 @@ const Admin = () => {
     }));
   };
 
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navigation />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="mb-8 font-serif text-3xl font-semibold">Create New Post</h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="font-serif text-3xl font-semibold">Create New Post</h1>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate("/auth");
+              }}
+              className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+            >
+              Logout
+            </button>
+          </div>
           
           <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-sm">
             <div>
@@ -92,6 +158,22 @@ const Admin = () => {
                 <option value="Career">Career</option>
                 <option value="Tutorials">Tutorials</option>
               </select>
+            </div>
+
+            <div>
+              <label htmlFor="readTime" className="block mb-2 text-sm font-medium text-gray-700">
+                Read Time
+              </label>
+              <input
+                type="text"
+                id="readTime"
+                name="readTime"
+                value={formData.readTime}
+                onChange={handleChange}
+                placeholder="e.g., 5 min read"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                required
+              />
             </div>
 
             <div>
@@ -141,9 +223,10 @@ const Admin = () => {
 
             <button
               type="submit"
-              className="w-full px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+              disabled={loading}
+              className="w-full px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:opacity-50"
             >
-              Create Post
+              {loading ? "Creating..." : "Create Post"}
             </button>
           </form>
         </div>
