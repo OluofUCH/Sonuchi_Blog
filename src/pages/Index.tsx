@@ -72,8 +72,8 @@ const Index = () => {
       {/* Featured Post */}
       <section className="container mx-auto px-4 py-12">
         <h2 className="mb-8 font-serif text-2xl font-semibold">Featured Post</h2>
-        <div className="animate-fade-up">
-          <ArticleCard {...featuredPost} />
+        <div className="animate-fade-up max-w-3xl mx-auto">
+          <ArticleCard {...featuredPost} className="max-h-[500px]" />
         </div>
       </section>
 

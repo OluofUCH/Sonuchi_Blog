@@ -8,11 +8,12 @@ interface ArticleCardProps {
   title: string;
   excerpt: string;
   date: string;
+  className?: string;
 }
 
-const ArticleCard = ({ image, category, title, excerpt, date }: ArticleCardProps) => {
+const ArticleCard = ({ image, category, title, excerpt, date, className = "" }: ArticleCardProps) => {
   return (
-    <article className="group relative overflow-hidden rounded-lg transition-all duration-300 hover:shadow-xl">
+    <article className={`group relative overflow-hidden rounded-lg transition-all duration-300 hover:shadow-xl ${className}`}>
       <Link to={`/post/1`} className="block">
         <div className="relative aspect-[16/10] overflow-hidden">
           <img

@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Trash2 } from "lucide-react";
 
 interface PostForm {
   title: string;
@@ -15,10 +16,18 @@ interface PostForm {
   readTime: string;
 }
 
+interface Post {
+  id: string;
+  title: string;
+  category: string;
+  created_at: string;
+}
+
 const Admin = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [formData, setFormData] = useState<PostForm>({
     title: "",
     category: "",
@@ -30,6 +39,7 @@ const Admin = () => {
 
   useEffect(() => {
     checkUser();
+    fetchPosts();
   }, []);
 
   const checkUser = async () => {
@@ -42,6 +52,50 @@ const Admin = () => {
       navigate("/auth");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('id, title, category, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPosts(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch posts",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Post deleted successfully!",
+      });
+
+      setPosts(posts.filter(post => post.id !== id));
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -79,6 +133,8 @@ const Admin = () => {
         image: "",
         readTime: "",
       });
+
+      fetchPosts(); // Refresh the posts list
     } catch (error: any) {
       toast({
         title: "Error",
@@ -122,7 +178,46 @@ const Admin = () => {
               Logout
             </button>
           </div>
+
+          {/* Posts List */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Your Posts</h2>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {posts.map((post) => (
+                      <tr key={post.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{post.title}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{post.category}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(post.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button
+                            onClick={() => handleDelete(post.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
           
+          {/* Create Post Form */}
           <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-sm">
             <div>
               <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-700">
