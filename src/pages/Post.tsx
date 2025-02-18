@@ -1,12 +1,32 @@
-import { useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import { Clock, Calendar, Heart, Share2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+
+interface Post {
+  title: string;
+  category: string;
+  author: string;
+  created_at: string;
+  read_time: string;
+  image: string;
+  content: string;
+}
 
 const Post = () => {
   const { id } = useParams();
+  const { toast } = useToast();
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPost();
+  }, [id]);
 
   useEffect(() => {
     const images = document.querySelectorAll("img");
@@ -17,41 +37,36 @@ const Post = () => {
         img.style.opacity = "1";
       };
     });
-  }, []);
+  }, [post]);
 
-  const post = {
-    title: "The Future of Web Development",
-    category: "Technology",
-    author: "John Doe",
-    date: "March 15, 2024",
-    readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-    content: `
-      <p class="mb-4">
-        The landscape of web development is constantly evolving, bringing new challenges and opportunities for developers around the world. As we look toward the future, several key trends are emerging that will shape how we build and interact with web applications.
-      </p>
-      
-      <h2 class="mb-4 font-serif text-2xl font-semibold">The Rise of AI-Powered Development</h2>
-      
-      <p class="mb-4">
-        Artificial Intelligence is revolutionizing how we approach web development. From automated testing to intelligent code completion, AI tools are becoming an integral part of the development workflow. These advancements are not just making developers more productive; they're fundamentally changing how we think about building applications.
-      </p>
-      
-      <p class="mb-4">
-        The integration of AI into development tools means that developers can focus more on solving complex problems and less on repetitive tasks. This shift is leading to more innovative solutions and better user experiences.
-      </p>
-      
-      <h2 class="mb-4 font-serif text-2xl font-semibold">Web Assembly and the Future of Performance</h2>
-      
-      <p class="mb-4">
-        Web Assembly (Wasm) is opening new possibilities for web applications, enabling near-native performance in the browser. This technology is particularly exciting for compute-intensive applications like video editing, 3D rendering, and complex simulations.
-      </p>
-      
-      <p class="mb-4">
-        As Web Assembly matures, we're seeing more traditional desktop applications moving to the web, creating new opportunities for cross-platform development and distribution.
-      </p>
-    `,
+  const fetchPost = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      setPost(data);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch post",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!post) {
+    return <div className="min-h-screen flex items-center justify-center">Post not found</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -66,12 +81,12 @@ const Post = () => {
             <span className="text-sm text-gray-500">•</span>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Clock className="h-4 w-4" />
-              {post.readTime}
+              {post.read_time}
             </div>
             <span className="text-sm text-gray-500">•</span>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="h-4 w-4" />
-              {post.date}
+              {new Date(post.created_at).toLocaleDateString()}
             </div>
           </div>
           
