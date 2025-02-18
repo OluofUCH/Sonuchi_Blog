@@ -1,18 +1,29 @@
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const categories = [
     { name: "Home", href: "/" },
-    { name: "Technology", href: "#technology" },
-    { name: "Design", href: "#design" },
-    { name: "Development", href: "#development" },
-    { name: "Career", href: "#career" },
-    { name: "Tutorials", href: "#tutorials" },
+    { name: "Technology", href: "/category/Technology" },
+    { name: "Design", href: "/category/Design" },
+    { name: "Development", href: "/category/Development" },
+    { name: "Career", href: "/category/Career" },
+    { name: "Tutorials", href: "/category/Tutorials" },
   ];
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md">
@@ -24,7 +35,7 @@ const Navigation = () => {
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex md:items-center md:space-x-8">
             <ul className="flex space-x-8">
               {categories.map((category) => (
                 <li key={category.name}>
@@ -37,6 +48,22 @@ const Navigation = () => {
                 </li>
               ))}
             </ul>
+            
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                type="search"
+                placeholder="Search posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-64 px-4 py-2 pr-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+            </form>
           </div>
 
           {/* Mobile menu button */}
@@ -51,6 +78,23 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden">
+            <form onSubmit={handleSearch} className="mb-4">
+              <div className="relative">
+                <input
+                  type="search"
+                  placeholder="Search posts..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 pr-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+              </div>
+            </form>
             <ul className="space-y-4 pb-4">
               {categories.map((category) => (
                 <li key={category.name}>
