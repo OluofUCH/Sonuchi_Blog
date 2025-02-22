@@ -60,7 +60,8 @@ const SearchPage = () => {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => (
               <ArticleCard
-                key={post.id}
+              key={post.id}
+              id={post.id}
                 image={post.image}
                 category={post.category}
                 title={post.title}

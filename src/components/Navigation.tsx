@@ -10,11 +10,11 @@ const Navigation = () => {
 
   const categories = [
     { name: "Home", href: "/" },
-    { name: "Technology", href: "/category/Technology" },
-    { name: "Design", href: "/category/Design" },
-    { name: "Development", href: "/category/Development" },
-    { name: "Career", href: "/category/Career" },
-    { name: "Tutorials", href: "/category/Tutorials" },
+    { name: "News", href: "/category/News" },
+    { name: "Entertainment", href: "/category/Entertainment" },
+    { name: "Music", href: "/category/Music" },
+    { name: "Politics", href: "/category/Politics" },
+    { name: "Gist", href: "/category/Gist" },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -31,7 +31,7 @@ const Navigation = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <a href="/" className="flex items-center">
-            <span className="font-serif text-xl font-semibold">DevBlog</span>
+            <span className="font-serif text-xl font-semibold">Sonuchi_Blog</span>
           </a>
 
           {/* Desktop Navigation */}

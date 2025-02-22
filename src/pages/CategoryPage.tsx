@@ -61,6 +61,7 @@ const CategoryPage = () => {
             {posts.map((post) => (
               <ArticleCard
                 key={post.id}
+                id={post.id}
                 image={post.image}
                 category={post.category}
                 title={post.title}

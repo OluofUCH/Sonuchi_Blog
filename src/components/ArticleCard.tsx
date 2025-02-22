@@ -3,6 +3,7 @@ import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ArticleCardProps {
+  id: string,
   image: string;
   category: string;
   title: string;
@@ -11,11 +12,11 @@ interface ArticleCardProps {
   className?: string;
 }
 
-const ArticleCard = ({ image, category, title, excerpt, date, className = "" }: ArticleCardProps) => {
+const ArticleCard = ({ id, image, category, title, excerpt, date, className = "" }: ArticleCardProps) => {
   return (
     <article className={`group relative overflow-hidden rounded-lg transition-all duration-300 hover:shadow-xl ${className}`}>
-      <Link to={`/post/1`} className="block">
-        <div className="relative aspect-[16/10] overflow-hidden">
+      <Link to={`/post/${id}`} className="block">
+        <div className="relative aspect-[20/10] overflow-hidden">
           <img
             src={image}
             alt={title}
@@ -35,7 +36,7 @@ const ArticleCard = ({ image, category, title, excerpt, date, className = "" }: 
           <h3 className="mb-2 font-serif text-xl font-semibold tracking-tight text-gray-900 group-hover:text-gray-700">
             {title}
           </h3>
-          <p className="mb-4 line-clamp-2 text-sm text-gray-600">{excerpt}</p>
+          <p className="mb-4 line-clamp-2 text-sm text-gray-600 break-words prose">{excerpt}</p>
           <time className="text-xs text-gray-500">{date}</time>
         </div>
       </Link>

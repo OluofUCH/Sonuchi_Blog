@@ -7,12 +7,14 @@ import Auth from "@/pages/Auth";
 import NotFound from "@/pages/NotFound";
 import CategoryPage from "@/pages/CategoryPage";
 import SearchPage from "@/pages/SearchPage";
+import ScrollToTop from "@/components/Scrolltotop";
 import { Toaster } from "@/components/ui/toaster";
 import "./App.css";
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/post/:id" element={<Post />} />

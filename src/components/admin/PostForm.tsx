@@ -1,4 +1,9 @@
 
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
 interface PostFormData {
   title: string;
   category: string;
@@ -16,6 +21,78 @@ interface PostFormProps {
 }
 
 const PostForm = ({ formData, loading, onChange, onSubmit }: PostFormProps) => {
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadLoading(true);
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: "Image must be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(filePath);
+
+      onChange({
+        target: {
+          name: 'image',
+          value: publicUrl
+        }
+      } as React.ChangeEvent<HTMLInputElement>);
+
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+
+    } catch (error: any) {
+      console.error('Error uploading image:', error.message);
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-sm">
       <div>
@@ -46,11 +123,11 @@ const PostForm = ({ formData, loading, onChange, onSubmit }: PostFormProps) => {
           required
         >
           <option value="">Select a category</option>
-          <option value="Technology">Technology</option>
-          <option value="Design">Design</option>
-          <option value="Development">Development</option>
-          <option value="Career">Career</option>
-          <option value="Tutorials">Tutorials</option>
+          <option value="News">News</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Music">Music</option>
+          <option value="Politics">Politics</option>
+          <option value="Gist">Gist</option>
         </select>
       </div>
 
@@ -72,17 +149,30 @@ const PostForm = ({ formData, loading, onChange, onSubmit }: PostFormProps) => {
 
       <div>
         <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-700">
-          Image URL
+          Image
         </label>
         <input
-          type="url"
+          type="file"
           id="image"
-          name="image"
-          value={formData.image}
-          onChange={onChange}
+          accept="image/*"
+          onChange={handleImageUpload}
           className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          required
         />
+        {uploadLoading && <p className="mt-2 text-sm text-gray-500">Uploading image...</p>}
+        {formData.image && (
+          <div className="mt-4 relative rounded-lg overflow-hidden">
+            <img 
+              src={formData.image} 
+              alt="Preview" 
+              className="h-48 w-full object-cover"
+            />
+            {uploadLoading && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <span className="text-white">Uploading...</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div>
@@ -115,13 +205,13 @@ const PostForm = ({ formData, loading, onChange, onSubmit }: PostFormProps) => {
         />
       </div>
 
-      <button
+      <Button
         type="submit"
-        disabled={loading}
-        className="w-full px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:opacity-50"
+        disabled={loading || uploadLoading}
+        className="w-full"
       >
         {loading ? "Creating..." : "Create Post"}
-      </button>
+      </Button>
     </form>
   );
 };

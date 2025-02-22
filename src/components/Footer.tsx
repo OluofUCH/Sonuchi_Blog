@@ -5,10 +5,10 @@ const Footer = () => {
   return (
     <footer className="mt-auto border-t bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8  sm:grid-cols-2 lg:grid-cols-4">
           {/* About */}
           <div>
-            <h3 className="mb-4 font-serif text-lg font-semibold">About DevBlog</h3>
+            <h3 className="mb-4 font-serif text-lg font-semibold">About SonuchiBlog</h3>
             <p className="text-sm text-gray-600">
               A modern blog platform for developers to share their knowledge and experiences.
             </p>
@@ -24,12 +24,6 @@ const Footer = () => {
               <li>
                 <a href="/admin" className="text-gray-600 hover:text-gray-900">Admin</a>
               </li>
-              <li>
-                <a href="#about" className="text-gray-600 hover:text-gray-900">About Us</a>
-              </li>
-              <li>
-                <a href="#contact" className="text-gray-600 hover:text-gray-900">Contact</a>
-              </li>
             </ul>
           </div>
 
@@ -38,16 +32,16 @@ const Footer = () => {
             <h3 className="mb-4 font-serif text-lg font-semibold">Categories</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#technology" className="text-gray-600 hover:text-gray-900">Technology</a>
+                <a href="/category/News" className="text-gray-600 hover:text-gray-900">News</a>
               </li>
               <li>
-                <a href="#design" className="text-gray-600 hover:text-gray-900">Design</a>
+                <a href="/category/Entertainment" className="text-gray-600 hover:text-gray-900">Entertainment</a>
               </li>
               <li>
-                <a href="#development" className="text-gray-600 hover:text-gray-900">Development</a>
+                <a href="/category/Music" className="text-gray-600 hover:text-gray-900">Music</a>
               </li>
               <li>
-                <a href="#tutorials" className="text-gray-600 hover:text-gray-900">Tutorials</a>
+                <a href="/category/Politics" className="text-gray-600 hover:text-gray-900">Politics</a>
               </li>
             </ul>
           </div>
@@ -71,7 +65,7 @@ const Footer = () => {
 
         <div className="mt-8 border-t pt-8 text-center">
           <p className="text-sm text-gray-600">
-            © {currentYear} DevBlog. All rights reserved.
+            © {currentYear} Olubiyi. All rights reserved.
           </p>
         </div>
       </div>
